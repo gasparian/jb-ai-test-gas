@@ -1,6 +1,0 @@
-[package]
-name = "rust_web_service_f_lib"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]

@@ -1,7 +1,7 @@
 use reqwest::Client;
 use std::net::TcpListener;
 use actix_web::{App, HttpServer};
-use rust_web_service_f_lib::hello_world;
+use rust_web_service_f::hello_world;
 use tokio::task::JoinHandle;
 
 async fn spawn_app() -> (String, JoinHandle<Result<(), std::io::Error>>) {
