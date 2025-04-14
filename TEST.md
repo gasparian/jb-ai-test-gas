@@ -14,6 +14,7 @@ You can test them by running `env-setuper` against each of these folders.
 In order to run more complex tests, it's worth to add an isolation level - containers.  
 We can start from the Ubuntu with minimal setup, and then ask setuper to setup a project.  
 In a [Dockerfile](./Dockerfile) you can find that I've copied those predefined projects inside the docker, to experiment with them.  
+You can copy your projects to the running container just via `docker cp`.  
 
 First, use the instructions from `env_setuper` project, and build the package with `make build`.  
 

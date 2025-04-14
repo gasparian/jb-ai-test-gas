@@ -18,11 +18,11 @@ services:
     cap_add:
       - ALL
     tmpfs:
-      - /tmp:size=8G
+      - /tmp:size=1G
     ulimits:
       nproc: 65535
       nofile:
         soft: 65535
         hard: 65535
-    mem_limit: 128G
+    mem_limit: 8G
     cpu_count: 0
