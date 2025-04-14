@@ -1,0 +1,7 @@
+.venv
+venv
+.pytest_cache
+rust_web_service/target/*
+rust_web_service_f/target/*
+python-mnist/venv
+python-mnist/.venv

@@ -1,0 +1,12 @@
+.git
+env-setuper/.git/
+env-setuper/.venv/
+env-setuper/venv/
+env-setuper/.pytest_cache/
+env-setuper/htmlcov/
+env-setuper/.coverage
+python-mnist/.venv/
+python-mnist/venv/
+python-mnist/.pytest_cache/
+rust_web_service/target/
+rust_web_service_f/target/

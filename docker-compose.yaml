@@ -1,0 +1,28 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: ${DOCKER_PLATFORM:-linux/amd64}
+    environment:
+      - PYENV_VERSION=3.12
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+    entrypoint: ["/bin/bash"]
+    privileged: true
+    tty: true
+    stdin_open: true
+    user: "0:0" # Go All-In
+    security_opt:
+      - apparmor:unconfined
+      - seccomp:unconfined
+    cap_add:
+      - ALL
+    tmpfs:
+      - /tmp:size=8G
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    mem_limit: 128G
+    cpu_count: 0
