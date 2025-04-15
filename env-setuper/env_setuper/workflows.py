@@ -7,18 +7,10 @@ import tiktoken
 from openai import OpenAI
 
 from env_setuper.assistants import EnvironmentAssistant
-from env_setuper.prompts import (
-  FINALIZE_PROMPT,
-  INSTALL_PROJ_DEPS_PROMPT,
-  INSTALL_SYSTEM_DEPS_PROMPT,
-  TECH_STACK_PROMPT,
-)
+from env_setuper.prompts import SETUP_PROMPT
 from env_setuper.terminal import (
   NoCallback,
   TerminalSubProcess,
-  env_dict_to_txt,
-  get_dicts_diff,
-  parse_printenv,
 )
 from env_setuper.tools import build_terminal_tool
 
@@ -47,26 +39,9 @@ class EnvironmentSetupWorkflow:
     self._max_agent_fails = max_agent_fails
     self._max_tokens_per_msg = max_tokens_per_msg
     self._stages = [
-      (TECH_STACK_PROMPT.format(tool_name=self._terminal_tool.name), "Identifying tech stack"),
-      (INSTALL_SYSTEM_DEPS_PROMPT.format(tool_name=self._terminal_tool.name), "Installing system dependencies"),
-      (INSTALL_PROJ_DEPS_PROMPT.format(tool_name=self._terminal_tool.name), "Installing project dependencies"),
-      (FINALIZE_PROMPT.format(tool_name=self._terminal_tool.name), "Finalizing the setup"),
+      (SETUP_PROMPT.format(tool_name=self._terminal_tool.name), "Setting up the environment"),
     ]
     self.n_steps = len(self._stages)
-
-  def _store_env(self) -> str | None:
-    env_main = self._env_orig_main
-    env_sub = self._terminal_process.exec("printenv | tee .env")
-    if env_sub.returncode == 0:
-      env_sub_parsed = parse_printenv(env_sub.stdout)
-      env_diff = get_dicts_diff(env_main, env_sub_parsed)
-      if env_diff:
-        env_diff_txt = env_dict_to_txt(env_diff)
-        new_env_path = self._terminal_process.workspace + "/.env"
-        with open(new_env_path, "w") as f:
-          f.write(env_diff_txt)
-        return new_env_path
-    return None
 
   def _truncate_to_token_limit(self, text, cut_head=True):
     encoding = tiktoken.encoding_for_model(self._environment_assistant.model)
@@ -126,7 +101,6 @@ class EnvironmentSetupWorkflow:
     name: str,
     messages: list[dict] = [],
     log_callback: Callable = NoCallback,
-    log_result: bool = True,
   ) -> tuple[list[dict], dict]:
     start_time = time.perf_counter()
     log_callback(step, name)
@@ -139,6 +113,7 @@ class EnvironmentSetupWorkflow:
     if step == 1:
       # NOTE: (@gas) jsut to help assistant with the first step
       ws_files_list_output = self._terminal_process.exec("ls -la")
+      # NOTE: (@gas) jsut a small hint for the model in a very beginning
       messages_.append(
         {
           "role": "assistant",
@@ -150,8 +125,7 @@ class EnvironmentSetupWorkflow:
     messages_ += messages
     messages_, result = self._run_agent_loop(messages_, log_callback=log_callback, log_args=[step, name])
     elapsed_time = time.perf_counter() - start_time
-    if log_result:
-      log_callback(step, name, result.get("message"), elapsed_time)
+    log_callback(step, name, result.get("message"), elapsed_time)
     return messages_, result
 
   def run(self, log_callback: Callable = NoCallback) -> list[dict]:
@@ -159,19 +133,15 @@ class EnvironmentSetupWorkflow:
     results: list[dict] = []
     for i, stage in enumerate(self._stages):
       prompt, name = stage
-      log_result = True
-      # NOTE: (gas) don't log full result for the last stage
-      if i == (self.n_steps - 1):
-        log_result = False
       messages, result = self._run_stage(
         step=i + 1,
         prompt=prompt,
         name=name,
         messages=messages,
         log_callback=log_callback,
-        log_result=log_result,
       )
       # NOTE: (@gas) exclude the first system message
+      #       in case of multi-stage workflow
       messages = messages[1:]
       results.append(result)
 
