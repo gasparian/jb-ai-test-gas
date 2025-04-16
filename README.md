@@ -37,3 +37,6 @@ You'll see the interactive shell, `env-setuper` will be already installed there,
 ```sh
 env-setuper ./python-mnist --no-restricted-shell
 ```  
+```sh
+env-setuper ./python-mnist --no-restricted-shell --max-agent-iter 50
+```
