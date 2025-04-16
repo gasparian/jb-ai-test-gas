@@ -42,16 +42,16 @@ class EnvironmentSetupWorkflow:
       (SETUP_PROMPT.format(tool_name=self._terminal_tool.name), "Setting up the environment"),
     ]
     self.n_steps = len(self._stages)
+    self._tt_encoding = tiktoken.encoding_for_model(self._environment_assistant.model)
 
   def _truncate_to_token_limit(self, text, cut_head=True):
-    encoding = tiktoken.encoding_for_model(self._environment_assistant.model)
-    tokens = encoding.encode(text)
+    tokens = self._tt_encoding.encode(text)
     if len(tokens) > self._max_tokens_per_msg:
       if cut_head:
         tokens = tokens[-self._max_tokens_per_msg :]
       else:
         tokens = tokens[: self._max_tokens_per_msg]
-      text = encoding.decode(tokens)
+      text = self._tt_encoding.decode(tokens)
     return text
 
   def _trim_env_tool_answers(self, msgs: list[dict]) -> list[dict]:
