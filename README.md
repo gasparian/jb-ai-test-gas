@@ -1,6 +1,8 @@
-# Testing Setuper 
+# Environment Setuper
 
-Here, you'll see 3 projects I was using for testing:  
+First, check out setuper cli tool details in the [env-setuper](./env-setuper/) project folder.  
+
+Here are 3 projects I was using for testing the tool:  
   - `python-mnist` - simple pytorch program to train CNN on Mnist data;  
   - `rust_web_service` - a simple rust hello world http server;  
   - `rust_web_service_f` - the same rust service, but with an error inside: `hello_world` handler can't be imported, since it's in a main file;  
