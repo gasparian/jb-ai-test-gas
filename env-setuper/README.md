@@ -110,6 +110,7 @@ The loop is restricted in the max. amount of iterations it could run, to not stu
 
 ### Thinkgs to improve  
 
+  - add evaluation with llm as a judge and test on more diverse projects;  
   - add propper tests;  
   - create `.env` file, with all newly added env vars. It didn't work properly for me, but it could be done in a nice way, to avoid modifying the central env but still make env. setup reproducible;  
   - refactor lot of hacky code, especially regarding logging and terminal usage;
